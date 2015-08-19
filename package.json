@@ -1,0 +1,25 @@
+{
+  "name": "Coursera-Algorithms-1",
+  "version": "0.0.1",
+  "description": "CS in JS",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/afs35mm/Coursera-Algorithms-1.git"
+  },
+  "author": "Andrew Schorr",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/afs35mm/Coursera-Algorithms-1/issues"
+  },
+  "homepage": "https://github.com/afs35mm/Coursera-Algorithms-1",
+  "devDependencies": {
+    "mocha": "^2.2.5"
+  },
+  "dependencies": {
+    "request": "^2.60.0"
+  }
+}
