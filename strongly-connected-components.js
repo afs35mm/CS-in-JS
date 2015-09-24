@@ -1,7 +1,8 @@
 var request = require('request');
+request.get('https://dl.dropboxusercontent.com/u/17526827/coursera/hw-4-sample.txt', function (error, response, body) {
+//request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt', function (error, response, body) {
+    var startTime = new Date().getTime();
 
-//request.get('https://dl.dropboxusercontent.com/u/17526827/coursera/hw-4-sample.txt', function (error, response, body) {
-request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt', function (error, response, body) {
     if (!error && response.statusCode == 200) {
         var body = body;
         var points = body.split('\n');
@@ -14,32 +15,30 @@ request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt
             }
         }
 
+        var parseTime = new Date().getTime();
+        console.log( ((parseTime - startTime) / 1000 ) + ' seconds to parse file');
+
         function bfs(node, localGraph, visitedNodes){
             var vertex,
-                visitedNodes = visitedNodes || {};
+                visitedNodes = visitedNodes || [];
 
-            if (!visitedNodes[node]) {
-                visitedNodes[node] = true;
+            if (visitedNodes.indexOf(node) === -1) {
+                visitedNodes.push(node);
             }
-
             for(var i = 0; i < localGraph.length; i ++){
 
                 if (localGraph[i][0] === node){
 
                     var row = localGraph[i].slice();
 
-                    if (!visitedNodes[row[1]]) {
-                        setTimeout( function() { // http://stackoverflow.com/questions/20936486/node-js-maximum-call-stack-size-exceeded
-                            bfs(row[1], localGraph, visitedNodes);
-                        }, 0 );
+                    if(visitedNodes.indexOf(row[1]) === -1) {
+                        bfs(row[1], localGraph, visitedNodes);
                     }
-
                 }
             }
 
             finishingTimes[node - 1] = counter++;
         }
-
 
         function flip (graph){
             var g = graph.map(function(arr) {
@@ -52,19 +51,26 @@ request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt
         }
 
         var pointsFlipped = flip(points),
-            visitedNodesGlobal = {},
+            visitedNodesGlobal = [],
             finishingTimes = [],
             counter = 1;
 
+        var flipTime = new Date().getTime();
+        console.log( ((flipTime - startTime) / 1000 ) + ' seconds to flip file');
+
         for(var j = pointsFlipped.length -1; j >= 0; j--) {
-            if( !visitedNodesGlobal[pointsFlipped[j][0]] ) {
+            if( visitedNodesGlobal.indexOf(pointsFlipped[j][0]) === -1) {
                 bfs(pointsFlipped[j][0], pointsFlipped, visitedNodesGlobal);
             }
         }
 
+        var firstBfsTime = new Date().getTime();
+        console.log( ((firstBfsTime - startTime) / 1000 ) + ' seconds to flip file');
+
 
         var newPoints = points.slice();
 
+        //replace points with finishing times
         for(var p = 0; p < newPoints.length; p++) {
             for (var m = 0 ; m < newPoints[p].length; m++) {
                 var newIndex = newPoints[p][m];
@@ -73,7 +79,7 @@ request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt
         }
         newPoints = flip(newPoints);
 
-        var flippedPointsVisited = {},
+        var flippedPointsVisited = [],
             scc = {};
 
         var largest = 0;
@@ -83,23 +89,20 @@ request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt
             }
         }
 
-        var marker = 0;
-
-        var lengthArr = [];
+        var marker = 0,
+            lengthArr = [];
 
         for(var k = largest; k >= 0; k--) {
 
             for(var r = 0; r < newPoints.length; r++) {
+                if (newPoints[r][0] === k) {
+                    if( flippedPointsVisited.indexOf(newPoints[r][0]) === -1) {
+                        bfs(newPoints[r][0], newPoints, flippedPointsVisited);
 
-                var newPointsFirstIndex = newPoints[r][0];
+                        var arrPart = flippedPointsVisited.slice(marker);
+                        lengthArr.push(arrPart.length);
 
-                if (newPointsFirstIndex === k) { 
-                    if( !flippedPointsVisited[newPoints[r][0]] ) {
-                        bfs(newPointsFirstIndex, newPoints, flippedPointsVisited);
-
-                        var objKeysLen = Object.keys(flippedPointsVisited).length;
-                        lengthArr.push(objKeysLen - marker);
-                        marker = objKeysLen;
+                        marker = flippedPointsVisited.length;
                     }
                 }
             }
