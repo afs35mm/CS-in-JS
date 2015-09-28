@@ -20,18 +20,17 @@ request.get('https://dl.dropboxusercontent.com/u/17526827/coursera/hw-4-sample.t
 
         function bfs(node, localGraph, visitedNodes){
             var vertex,
-                visitedNodes = visitedNodes || [];
-
-            if (visitedNodes.indexOf(node) === -1) {
-                visitedNodes.push(node);
+                visitedNodes = visitedNodes || {};
+            if ( !visitedNodes[node] ) {
+                visitedNodes[node] = true;
             }
             for(var i = 0; i < localGraph.length; i ++){
 
                 if (localGraph[i][0] === node){
 
-                    var row = localGraph[i].slice();
+                    var row = localGraph[i].slice(0);
 
-                    if(visitedNodes.indexOf(row[1]) === -1) {
+                    if( !visitedNodes[row[1]] ) {
                         bfs(row[1], localGraph, visitedNodes);
                     }
                 }
@@ -45,13 +44,13 @@ request.get('https://dl.dropboxusercontent.com/u/17526827/coursera/hw-4-sample.t
                 var tmp = arr[0];
                 arr[0] = arr[1];
                 arr[1] = tmp;
-                return arr.slice();
+                return arr.slice(0);
             });
             return g;
         }
 
         var pointsFlipped = flip(points),
-            visitedNodesGlobal = [],
+            visitedNodesGlobal = {},
             finishingTimes = [],
             counter = 1;
 
@@ -59,16 +58,16 @@ request.get('https://dl.dropboxusercontent.com/u/17526827/coursera/hw-4-sample.t
         console.log( ((flipTime - startTime) / 1000 ) + ' seconds to flip file');
 
         for(var j = pointsFlipped.length -1; j >= 0; j--) {
-            if( visitedNodesGlobal.indexOf(pointsFlipped[j][0]) === -1) {
+            if( !visitedNodesGlobal[pointsFlipped[j][0]] ) {
                 bfs(pointsFlipped[j][0], pointsFlipped, visitedNodesGlobal);
             }
         }
 
         var firstBfsTime = new Date().getTime();
-        console.log( ((firstBfsTime - startTime) / 1000 ) + ' seconds to flip file');
+        console.log( ((firstBfsTime - startTime) / 1000 ) + ' seconds to first bfs search');
 
 
-        var newPoints = points.slice();
+        var newPoints = points.slice(0);
 
         //replace points with finishing times
         for(var p = 0; p < newPoints.length; p++) {
@@ -79,7 +78,7 @@ request.get('https://dl.dropboxusercontent.com/u/17526827/coursera/hw-4-sample.t
         }
         newPoints = flip(newPoints);
 
-        var flippedPointsVisited = [],
+        var flippedPointsVisited = {},
             scc = {};
 
         var largest = 0;
@@ -96,21 +95,20 @@ request.get('https://dl.dropboxusercontent.com/u/17526827/coursera/hw-4-sample.t
 
             for(var r = 0; r < newPoints.length; r++) {
                 if (newPoints[r][0] === k) {
-                    if( flippedPointsVisited.indexOf(newPoints[r][0]) === -1) {
+                    if( !flippedPointsVisited[newPoints[r][0]] ) {
                         bfs(newPoints[r][0], newPoints, flippedPointsVisited);
+                        
+                        lengthArr.push(Object.keys(flippedPointsVisited).length - marker);
+                        marker = Object.keys(flippedPointsVisited).length;
 
-                        var arrPart = flippedPointsVisited.slice(marker);
-                        lengthArr.push(arrPart.length);
-
-                        marker = flippedPointsVisited.length;
                     }
                 }
             }
         }
 
-        lengthArr.sort(function(a, b){
-            return b - a;
-        })
+        // lengthArr.sort(function(a, b){
+        //     return b - a;
+        // })
 
         console.log(lengthArr);
     }
