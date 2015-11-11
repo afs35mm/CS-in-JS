@@ -1,6 +1,6 @@
 var request = require('request');
-request.get('https://dl.dropboxusercontent.com/u/17526827/coursera/hw-4-sample.txt', function (error, response, body) {
-//request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt', function (error, response, body) {
+//request.get('https://dl.dropboxusercontent.com/u/17526827/coursera/hw-4-sample.txt', function (error, response, body) {
+request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt', function (error, response, body) {
     var startTime = new Date().getTime();
 
     if (!error && response.statusCode == 200) {
@@ -78,6 +78,11 @@ request.get('https://dl.dropboxusercontent.com/u/17526827/coursera/hw-4-sample.t
         }
         newPoints = flip(newPoints);
 
+
+        var replacePointsFinisingTimes = new Date().getTime();
+        console.log( ((replacePointsFinisingTimes - startTime) / 1000 ) + ' seconds to replace points with finishing times');
+
+
         var flippedPointsVisited = {},
             scc = {};
 
@@ -106,9 +111,13 @@ request.get('https://dl.dropboxusercontent.com/u/17526827/coursera/hw-4-sample.t
             }
         }
 
+        var lastBfs = new Date().getTime();
+        console.log( ((lastBfs - startTime) / 1000 ) + ' seconds for last bfs');
+
         // lengthArr.sort(function(a, b){
         //     return b - a;
         // })
+        //ulimit -s 65500; node --stack_size=65500 scc.js
 
         console.log(lengthArr);
     }
