@@ -27,7 +27,45 @@ var helpers = {
         var temp = arr[index1];
         arr[index1] = arr[index2];
         arr[index2] = temp;
-    }
+    },
+
+    getLargestFirstIndex: function(multiDimensionalArray) {
+        var largest = 0,
+            largestIndex;
+        for(var i = 0; i < multiDimensionalArray.length; i++) {
+            if (multiDimensionalArray[i][0] > largest) {
+                largestIndex = i;
+                largest = multiDimensionalArray[i][0];
+            }
+        }
+        return {
+            largestIndex: largestIndex,
+            largest: largest
+        }
+    },
+
+    flipPoints: function(graph){
+        reversedArr = [];
+        graph.map(function(arr) {
+            var swappedRow = [];
+            swappedRow[0] = arr[1];
+            swappedRow[1] = arr[0];
+            reversedArr.push(swappedRow);
+        });
+        return reversedArr;
+    },
+        
+    makeAdjList: function(pointsList) {
+        var adjList = {};
+        for(var i = 0; i < pointsList.length; i++){
+            var row = pointsList[i];
+            if (!adjList[row[0]]) {
+                adjList[row[0]] = [];
+            } 
+            adjList[row[0]].push(row[1]);
+        }
+        return adjList;
+    },
 
 }
 
