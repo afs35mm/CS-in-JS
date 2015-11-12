@@ -26,13 +26,18 @@ request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt
         //pointsAdjList = helpers.makeAdjList(points);
         flippedPointsAdjList = helpers.makeAdjList(pointsFlipped);        
 
+        var flipTime = new Date().getTime();
+        console.log( ((flipTime - startTime) / 1000 ) + ' seconds to flip list and convert to adj list');
+
         /*
         * GET FINISHING TIMES
         */
         var largestObj = helpers.getLargestFirstIndex(pointsFlipped),
-            finishingHash = {},
+            //finishingHash = {},
+            finishingArr = [],
             seenVerticies = {},
             finishingTime = 1;
+        finishingArr[0] = 'hold';
         //console.log('the largest number in points flipped is ' + largestObj.largest + ', and it is at position ' + largestObj.largestIndex);
         for(var j = largestObj.largest; j > 0; j--) {
             if (!seenVerticies[j]) {
@@ -51,103 +56,73 @@ request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt
                     dfsForFinishingTimes(adjList, row[i]);
                 }
             }
-            finishingHash[finishingTime] = vertex;
+            //finishingHash[finishingTime] = vertex;
+            finishingArr[vertex] = finishingTime;
             finishingTime++;
-        };
-        console.log(finishingHash);
+        };        
+
+        var getFinishingTimes = new Date().getTime();
+        console.log( ((getFinishingTimes - startTime) / 1000 ) + ' seconds to get finishing times');
 
 
-                // function bfs(node, localGraph, visitedNodes){
-        //     var vertex,
-        //         visitedNodes = visitedNodes || {};
-        //     if ( !visitedNodes[node] ) {
-        //         visitedNodes[node] = true;
-        //     }
-        //     for(var i = 0; i < localGraph.length; i ++){
+        /*
+        * MAKE NEW GRAPH
+        */ 
+        var finishingTimesGraph = [];
+        for(var i = 0; i < points.length; i++) {
+            var newRow = [];
+            for(var j = 0; j < points[i].length; j++){
+                var mappedValue = finishingArr[points[i][j]];
+                newRow.push(mappedValue);
+            }
+            finishingTimesGraph.push(newRow);
+        }
+        finishingTimesAdjList = helpers.makeAdjList(finishingTimesGraph);        
+        
+        var largestPointsFlipped = helpers.getLargestFirstIndex(finishingTimesGraph);
+        // console.log(largestPointsFlipped);
+        // console.log(finishingTimesAdjList);
 
-        //         if (localGraph[i][0] === node){
+        /*
+        * DO DFS ON NEW GRAPH POINTS OF FINISHING TIMES
+        */
+        var flippedSeenVerticies = {},
+            marker = 0,
+            leaderCount = {};            
+        for (var i = largestPointsFlipped.largest; i > 0; i --) {
+            if(!flippedSeenVerticies[i]) {
+                doFinalDfs(finishingTimesAdjList, i);
+            }
+        }
 
-        //             var row = localGraph[i].slice(0);
+        function doFinalDfs(adjList, vertex) {
+            flippedSeenVerticies[vertex] = true;
+            var row = adjList[vertex];
+            if(!row){
+                row = [];
+            }
+            for(var h = 0; h < row.length; h++){
+                if (!flippedSeenVerticies[row[h]]) {
+                    doFinalDfs(adjList, row[h]);
+                }
+            }
+            
+            if (!leaderCount[i]) {
+                leaderCount[i] = 0;
+            } 
+            leaderCount[i] = leaderCount[i] + 1;    
+        }
 
-        //             if( !visitedNodes[row[1]] ) {
-        //                 bfs(row[1], localGraph, visitedNodes);
-        //             }
-        //         }
-        //     }
-        //     finishingTimes[node - 1] = counter++;
-        // }
+        var winners = [];
 
+        for (var key in leaderCount) {
+            winners.push(leaderCount[key]);
+        }
 
-        // var pointsFlipped = flip(points),
-        //     visitedNodesGlobal = {},
-        //     finishingTimes = [],
-        //     counter = 1;
+        (winners).sort(function(a,b){
+            return a - b;
+        });
 
-        // var flipTime = new Date().getTime();
-        // console.log( ((flipTime - startTime) / 1000 ) + ' seconds to flip file');
-
-        // for(var j = pointsFlipped.length -1; j >= 0; j--) {
-        //     if( !visitedNodesGlobal[pointsFlipped[j][0]] ) {
-        //         bfs(pointsFlipped[j][0], pointsFlipped, visitedNodesGlobal);
-        //     }
-        // }
-
-        // var firstBfsTime = new Date().getTime();
-        // console.log( ((firstBfsTime - startTime) / 1000 ) + ' seconds to first bfs search');
-
-
-        // var newPoints = points.slice(0);
-
-        // //replace points with finishing times
-        // for(var p = 0; p < newPoints.length; p++) {
-        //     for (var m = 0 ; m < newPoints[p].length; m++) {
-        //         var newIndex = newPoints[p][m];
-        //         newPoints[p][m] = finishingTimes[newIndex -1];
-        //     }
-        // }
-        // newPoints = flip(newPoints);
-
-
-        // var replacePointsFinisingTimes = new Date().getTime();
-        // console.log( ((replacePointsFinisingTimes - startTime) / 1000 ) + ' seconds to replace points with finishing times');
-
-
-        // var flippedPointsVisited = {},
-        //     scc = {};
-
-        // var largest = 0;
-        // for (var e = 0; e < pointsFlipped.length; e++) {
-        //     if (pointsFlipped[e][0] > largest) {
-        //         largest = pointsFlipped[e][0];
-        //     }
-        // }
-
-        // var marker = 0,
-        //     lengthArr = [];
-
-        // for(var k = largest; k >= 0; k--) {
-
-        //     for(var r = 0; r < newPoints.length; r++) {
-        //         if (newPoints[r][0] === k) {
-        //             if( !flippedPointsVisited[newPoints[r][0]] ) {
-        //                 bfs(newPoints[r][0], newPoints, flippedPointsVisited);
-
-        //                 lengthArr.push(Object.keys(flippedPointsVisited).length - marker);
-        //                 marker = Object.keys(flippedPointsVisited).length;
-
-        //             }
-        //         }
-        //     }
-        // }
-
-        // var lastBfs = new Date().getTime();
-        // console.log( ((lastBfs - startTime) / 1000 ) + ' seconds for last bfs');
-
-        // // lengthArr.sort(function(a, b){
-        // //     return b - a;
-        // // })
-        // //ulimit -s 65500; node --stack_size=65500 scc.js
-
-        // console.log(lengthArr);
+        console.log(winners.splice(0,5));
     }
 });
