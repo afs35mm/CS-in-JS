@@ -13,17 +13,19 @@ request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt
         var points = body.split('\n');
 
         for (var i = 0; i < points.length; i++ ){
+            points[i].trim()
             points[i] = points[i].split(' ');
-            points[i].splice(-1);
             for(var j = 0; j < points[i].length; j++){
                 points[i][j] = parseInt(points[i][j]);
             }
         }
+        // console.log(points.length);
+        // console.log(points[points.length -1]);
         var parseTime = new Date().getTime();
         console.log( ((parseTime - startTime) / 1000 ) + ' seconds to parse file');
 
         var pointsFlipped = helpers.flipPoints(points);        
-        //pointsAdjList = helpers.makeAdjList(points);
+        pointsAdjList = helpers.makeAdjList(points);
         flippedPointsAdjList = helpers.makeAdjList(pointsFlipped);        
 
         var flipTime = new Date().getTime();
@@ -32,14 +34,19 @@ request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt
         /*
         * GET FINISHING TIMES
         */
-        var largestObj = helpers.getLargestFirstIndex(pointsFlipped),
+        var largestNum = helpers.getLargestIndex(pointsFlipped),
             //finishingHash = {},
             finishingArr = [],
             seenVerticies = {},
             finishingTime = 1;
         finishingArr[0] = 'hold';
+
+
+        //console.log(flippedPointsAdjList);
+
         //console.log('the largest number in points flipped is ' + largestObj.largest + ', and it is at position ' + largestObj.largestIndex);
-        for(var j = largestObj.largest; j > 0; j--) {
+        
+        for(var j = largestNum; j > 0; j--) {
             if (!seenVerticies[j]) {
                 dfsForFinishingTimes(flippedPointsAdjList, j);
             }
@@ -61,9 +68,10 @@ request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt
             finishingTime++;
         };        
 
+        console.log(finishingArr);
+
         var getFinishingTimes = new Date().getTime();
         console.log( ((getFinishingTimes - startTime) / 1000 ) + ' seconds to get finishing times');
-
 
         /*
         * MAKE NEW GRAPH
@@ -77,11 +85,14 @@ request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt
             }
             finishingTimesGraph.push(newRow);
         }
+
+        var makeNewGraphTime = new Date().getTime();
+        console.log( ((makeNewGraphTime - startTime) / 1000 ) + ' seconds to make new graph');
+
+
         finishingTimesAdjList = helpers.makeAdjList(finishingTimesGraph);        
+        var largestIndex = helpers.getLargestIndex(finishingTimesGraph);
         
-        var largestPointsFlipped = helpers.getLargestFirstIndex(finishingTimesGraph);
-        // console.log(largestPointsFlipped);
-        // console.log(finishingTimesAdjList);
 
         /*
         * DO DFS ON NEW GRAPH POINTS OF FINISHING TIMES
@@ -89,7 +100,7 @@ request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt
         var flippedSeenVerticies = {},
             marker = 0,
             leaderCount = {};            
-        for (var i = largestPointsFlipped.largest; i > 0; i --) {
+        for (var i = largestIndex; i > 0; i --) {
             if(!flippedSeenVerticies[i]) {
                 doFinalDfs(finishingTimesAdjList, i);
             }
@@ -120,7 +131,7 @@ request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt
         }
 
         (winners).sort(function(a,b){
-            return a - b;
+            return b-a;
         });
 
         console.log(winners.splice(0,5));

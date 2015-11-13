@@ -29,19 +29,17 @@ var helpers = {
         arr[index2] = temp;
     },
 
-    getLargestFirstIndex: function(multiDimensionalArray) {
+    getLargestIndex: function(multiDimensionalArray) {
         var largest = 0,
             largestIndex;
         for(var i = 0; i < multiDimensionalArray.length; i++) {
-            if (multiDimensionalArray[i][0] > largest) {
-                largestIndex = i;
-                largest = multiDimensionalArray[i][0];
+            for( var j = 0; j < multiDimensionalArray[i].length; j++) {
+                if(multiDimensionalArray[i][j] > largest) {
+                    largest = multiDimensionalArray[i][j];
+                }
             }
         }
-        return {
-            largestIndex: largestIndex,
-            largest: largest
-        }
+        return largest
     },
 
     flipPoints: function(graph){
