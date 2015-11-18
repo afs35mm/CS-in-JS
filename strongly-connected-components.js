@@ -1,15 +1,19 @@
 var helpers = require('./helpers');
-var request = require('request');
-//request.get('https://dl.dropboxusercontent.com/u/17526827/coursera/hw-4-sample.txt', function (error, response, body) {
-request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt', function (error, response, body) {
+var fs = require('fs');
+// var request = require('request');
+
+// Original HTTP get was from:
+//request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt', function (error, response, body) {
+// necessary flags: node --stack-size=65500 --max-old-space-size=8192  strongly-connected-components.js
+fs.readFile('./data/SCC-data.txt', function(err, data){
     var startTime = new Date().getTime();
 
-    if (!error && response.statusCode == 200) {
-        
+    if (!err) {
+
         /*
         * PARSE FILE
         */
-        var body = body;
+        var body = data.toString();
         var points = body.split('\n');
 
         for (var i = 0; i < points.length; i++ ){
@@ -24,9 +28,9 @@ request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt
         var parseTime = new Date().getTime();
         console.log( ((parseTime - startTime) / 1000 ) + ' seconds to parse file');
 
-        var pointsFlipped = helpers.flipPoints(points);        
+        var pointsFlipped = helpers.flipPoints(points);
         pointsAdjList = helpers.makeAdjList(points);
-        flippedPointsAdjList = helpers.makeAdjList(pointsFlipped);        
+        flippedPointsAdjList = helpers.makeAdjList(pointsFlipped);
 
         var flipTime = new Date().getTime();
         console.log( ((flipTime - startTime) / 1000 ) + ' seconds to flip list and convert to adj list');
@@ -35,7 +39,6 @@ request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt
         * GET FINISHING TIMES
         */
         var largestNum = helpers.getLargestIndex(pointsFlipped),
-            //finishingHash = {},
             finishingArr = [],
             seenVerticies = {},
             finishingTime = 1;
@@ -43,9 +46,7 @@ request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt
 
 
         //console.log(flippedPointsAdjList);
-
         //console.log('the largest number in points flipped is ' + largestObj.largest + ', and it is at position ' + largestObj.largestIndex);
-        
         for(var j = largestNum; j > 0; j--) {
             if (!seenVerticies[j]) {
                 dfsForFinishingTimes(flippedPointsAdjList, j);
@@ -66,16 +67,14 @@ request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt
             //finishingHash[finishingTime] = vertex;
             finishingArr[vertex] = finishingTime;
             finishingTime++;
-        };        
-
-        console.log(finishingArr);
+        };
 
         var getFinishingTimes = new Date().getTime();
         console.log( ((getFinishingTimes - startTime) / 1000 ) + ' seconds to get finishing times');
 
         /*
         * MAKE NEW GRAPH
-        */ 
+        */
         var finishingTimesGraph = [];
         for(var i = 0; i < points.length; i++) {
             var newRow = [];
@@ -90,16 +89,16 @@ request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt
         console.log( ((makeNewGraphTime - startTime) / 1000 ) + ' seconds to make new graph');
 
 
-        finishingTimesAdjList = helpers.makeAdjList(finishingTimesGraph);        
+        finishingTimesAdjList = helpers.makeAdjList(finishingTimesGraph);
         var largestIndex = helpers.getLargestIndex(finishingTimesGraph);
-        
+
 
         /*
         * DO DFS ON NEW GRAPH POINTS OF FINISHING TIMES
         */
         var flippedSeenVerticies = {},
             marker = 0,
-            leaderCount = {};            
+            leaderCount = {};
         for (var i = largestIndex; i > 0; i --) {
             if(!flippedSeenVerticies[i]) {
                 doFinalDfs(finishingTimesAdjList, i);
@@ -117,11 +116,11 @@ request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/SCC.txt
                     doFinalDfs(adjList, row[h]);
                 }
             }
-            
+
             if (!leaderCount[i]) {
                 leaderCount[i] = 0;
-            } 
-            leaderCount[i] = leaderCount[i] + 1;    
+            }
+            leaderCount[i] = leaderCount[i] + 1;
         }
 
         var winners = [];
