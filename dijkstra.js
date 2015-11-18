@@ -32,8 +32,7 @@ function dikstras(finishNode, hash, greedyScore, seenNodes) {
     }
 
     for(var i = 0; i < seenNodes.length; i++) {
-        var vertex = seenNodes[i],
-            gc;
+        var vertex = seenNodes[i];
 
         if (!greedyScore[vertex]) {
             greedyScore[vertex] = 0;
