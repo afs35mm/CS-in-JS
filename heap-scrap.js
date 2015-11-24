@@ -1,27 +1,23 @@
-var heap = require('./heap.js');
+var MinHeap = require('./min-heap.js');
+var MaxHeap = require('./max-heap.js');
 
-var bh = new heap();
+var lowHeap = new MaxHeap();
+lowHeap.add(1);
+lowHeap.add(2);
+lowHeap.add(3);
+lowHeap.add(4);
+var head = lowHeap.removeHead();
+console.log(head);
 
-bh.push(1);
-bh.push(2);
-bh.push(3);
-bh.push(-4);
-bh.push(7);
-bh.push(8);
-bh.push(98);
-bh.push(0);
+var highHeap = new MinHeap();
+highHeap.add(1);
+highHeap.add(2);
+highHeap.add(3);
+highHeap.add(4);
 
-console.log(bh.arr());
-
-console.log(bh.getMin());
-
-console.log(bh.arr());
-
-bh.push(99);
-bh.push(100);
-bh.push(90);
-bh.push(80);
-bh.push(40);
-
-console.log(bh.arr());
-console.log(bh.pop());
+console.log(highHeap.getHeap());
+var head = highHeap.removeHead();
+console.log(head);
+console.log(highHeap.getHeap());
+highHeap.add(head);
+console.log(highHeap.getHeap());
