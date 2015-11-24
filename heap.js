@@ -53,9 +53,9 @@ var binaryHeap = function(comp) {
         }
     };
 
-    var that = {};
+    //var that = {};
 
-    that.pop = function() {
+    this.pop = function() {
         if (arr.length === 0) {
             throw new Error("pop() called on emtpy binary heap");
         }
@@ -69,16 +69,36 @@ var binaryHeap = function(comp) {
         return value;
     };
 
-    that.push = function(value) {
+    this.push = function(value) {
         arr.push(value);
         bubbleUp(arr.length - 1);
     };
 
-    that.size = function() {
+    this.size = function() {
         return arr.length;
     };
 
-    return that;
+    this.arr = function() {
+        return arr;
+    }
+
+    this.getMin = function() {
+        var startPoint = Math.floor(arr.length / 2) - 1;
+        var lowest = Infinity,
+            lowestIndex = null;
+        for (var j = startPoint; j < arr.length; j++){
+            if (arr[j] < lowest) {
+                lowest = arr[j];
+                lowestIndex = j;
+            }
+        }
+
+        var min = arr.splice(lowestIndex, 1);
+        return min[0];
+    }
+
+
+    return this;
 };
 
 module.exports = binaryHeap
