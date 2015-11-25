@@ -1,13 +1,13 @@
-var request = require('request');
+var fs = require('fs');
+//var request = require('request');
 var MinHeap = require('./min-heap.js');
 var MaxHeap = require('./max-heap.js');
 
-// request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/Median.txt', function (error, response, body) {
 //request.get('http://spark-public.s3.amazonaws.com/algo1/programming_prob/Median.txt', function (error, response, body) {
-request.get('https://dl.dropboxusercontent.com/u/17526827/coursera/hw-6-2.txt', function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-        var intsArr = body.split('\n');
-        intsArr.splice(-1);
+fs.readFile('./data/median-maintence-data-xl.txt', function(err, data){
+    if (!err) {
+        var intsStr = data.toString().trim();
+        var intsArr = intsStr.split('\n');
 
         var lowHeap = new MaxHeap(),
             highHeap = new MinHeap(),
@@ -23,39 +23,31 @@ request.get('https://dl.dropboxusercontent.com/u/17526827/coursera/hw-6-2.txt', 
                 median = target;
                 lowHeap.add(target);
             } else {
+
                 if (target < median) {
                     lowHeap.add(target);
                 } else {
-                    highHeap.add(target);
+                    highHeap.add(target);                    
                 }
 
-                if (lowHeap.heapSize() + 2 === highHeap.heapSize()) {
-                    lowHeap.add(highHeap.removeHead());
-                } else if (lowHeap.heapSize() === highHeap.heapSize() + 2) {
+                if (lowHeap.heapSize() > highHeap.heapSize() + 1) {
                     highHeap.add(lowHeap.removeHead());
+                } else if (highHeap.heapSize() > lowHeap.heapSize() + 1) {
+                    lowHeap.add(highHeap.removeHead());
                 }
 
-                console.log(lowHeap.getHeap(), highHeap.getHeap());
-
-                //now find median
-                if (lowHeap.heapSize() === highHeap.heapSize()){
-                    median = lowHeap.removeHead();
-                    lowHeap.add(median);
-                } else if (lowHeap.heapSize() < highHeap.heapSize()) {
-                    median = highHeap.removeHead();
-                    highHeap.add(median);
-                } else {
-                    median = lowHeap.removeHead();
-                    lowHeap.add(median);
+                if (lowHeap.heapSize() === highHeap.heapSize() || lowHeap.heapSize() > highHeap.heapSize()) {
+                    median = lowHeap.getHeap()[0];
+                } else if (highHeap.heapSize() > lowHeap.heapSize()) {
+                    median = highHeap.getHeap()[0];
                 }
+
             }
-
-            console.log(median);
 
             medianSum += median;
 
         }
-
         console.log(medianSum);
-    }
+        //console.log(medianSum % 10000);
+    }   
 });
