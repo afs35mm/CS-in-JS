@@ -1,7 +1,6 @@
 var helpers = {
 
     mergeSorted: function(arr1, arr2) {
-
         var sortedArr =[];
 
         while(arr1.length && arr2.length){
@@ -52,14 +51,14 @@ var helpers = {
         });
         return reversedArr;
     },
-        
+
     makeAdjList: function(pointsList) {
         var adjList = {};
         for(var i = 0; i < pointsList.length; i++){
             var row = pointsList[i];
             if (!adjList[row[0]]) {
                 adjList[row[0]] = [];
-            } 
+            }
             adjList[row[0]].push(row[1]);
         }
         return adjList;

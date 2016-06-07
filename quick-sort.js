@@ -115,4 +115,31 @@ var unsortedArrMedian = [6,4,2,9,16,3,8,22,14,16];
 quickSortBack(unsortedArrMedian, 0, unsortedArrMedian.length - 1);
 console.log(unsortedArrMedian);
 
+/**
+** BONUS: Quick sort tail recursion
+**/
 
+function partitionTail(arr, idx1, idx2) {
+    var div = idx1 + 1; // very first index as pivot
+    for(var i = idx1 + 1; i <= idx2; i++) {
+        if (arr[i] <= arr[idx1]) {
+            helpers.swap(arr, div, i);
+            div++;
+        }
+    }
+    helpers.swap(arr, idx1, div - 1);
+
+    return div - 1;
+}
+
+function quickSortTailRecursion(arrTail, left, right) {
+    while (left < right) {
+        var mid = partitionTail(arrTail, left, right);
+        quickSortTailRecursion(arrTail, left, mid - 1);
+        left = mid + 1;
+    }
+}
+
+var unsortedArrTail = [8, 10, 1, 9, 7, 2, 6, 3, 5, 4];
+quickSortTailRecursion(unsortedArrTail, 0, unsortedArrTail.length - 1);
+console.log(unsortedArrTail);

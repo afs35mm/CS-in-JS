@@ -1,4 +1,5 @@
-var unsortedArr = [ 6, 1, 9, 25, 982, 34, 87, 20, 38, 99, 24, 74, 20 , 31];
+var helpers = require('./helpers');
+var unsortedArr = [5, 3, 8, 9, 1, 7, 0, 2, 6, 4];
 
 function merge(arr) {
     if (arr.length <= 1) {
