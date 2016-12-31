@@ -48,7 +48,6 @@ var data = [
     [1, 4],
     [5, 3],
 ];
-// 0 2 6
 
 function getPacketLoss(lines) {
     var finishTime = 0;
